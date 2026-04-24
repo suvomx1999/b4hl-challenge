@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { parseEntries, buildHierarchies } = require('./processor');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(cors());
@@ -23,10 +24,28 @@ app.post('/bfhl', (req, res) => {
   const { valid_edges, invalid_entries, duplicate_edges } = parseEntries(data);
   const { hierarchies, summary } = buildHierarchies(valid_edges);
 
+  let currentUserId = USER_ID;
+  let currentEmailId = EMAIL_ID;
+  let currentRollNumber = ROLL_NUMBER;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      // Decode with shared secret. Make sure it doesn't crash on fail.
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bfhl-secret-key');
+      if (decoded.user_id) currentUserId = decoded.user_id;
+      if (decoded.email_id) currentEmailId = decoded.email_id;
+      if (decoded.college_roll_number) currentRollNumber = decoded.college_roll_number;
+    } catch (err) {
+      console.warn("Invalid or missing JWT signature. Falling back to ENV variables.");
+    }
+  }
+
   res.json({
-    user_id: USER_ID,
-    email_id: EMAIL_ID,
-    college_roll_number: ROLL_NUMBER,
+    user_id: currentUserId,
+    email_id: currentEmailId,
+    college_roll_number: currentRollNumber,
     hierarchies,
     invalid_entries,
     duplicate_edges,
