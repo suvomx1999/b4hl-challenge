@@ -45,13 +45,21 @@ function buildHierarchies(valid_edges) {
   const adj = {};
   const inDegree = {};
   const nodes = new Set();
-  const parentOf = {}; 
+  const parentOf = {};
+  // First, populate all nodes involved in valid edges
+  for (let edge of valid_edges) {
+    nodes.add(edge.from);
+    nodes.add(edge.to);
+  }
   
+  // Initialize inDegree for all nodes
+  for (let node of nodes) {
+    inDegree[node] = 0;
+  }
+  
+  // Build adjacency list, enforcing the diamond rule
   for (let edge of valid_edges) {
     const { from, to } = edge;
-    nodes.add(from);
-    nodes.add(to);
-    
     if (parentOf.hasOwnProperty(to)) {
       continue; // silently discard subsequent parent edges for same child
     }
@@ -59,8 +67,7 @@ function buildHierarchies(valid_edges) {
     parentOf[to] = from;
     if (!adj[from]) adj[from] = [];
     adj[from].push(to);
-    inDegree[to] = (inDegree[to] || 0) + 1;
-    if (!inDegree[from]) inDegree[from] = 0;
+    inDegree[to]++;
   }
   
   let potentialRoots = [...nodes].filter(n => inDegree[n] === 0);
