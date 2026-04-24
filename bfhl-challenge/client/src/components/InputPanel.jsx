@@ -1,18 +1,25 @@
 import { useState } from 'react';
 
-const exampleData = {
-  "data": ["A->B","A->C","B->D","X->Y","Y->Z","Z->X","hello","G->H","G->H","G->I"]
-};
-
 function InputPanel({ onProcess, loading, error }) {
-  const [inputVal, setInputVal] = useState(JSON.stringify(exampleData, null, 2));
+  const defaultRaw = "A->B, A->C, B->D\nX->Y, Y->Z, Z->X\nhello, G->H, G->H, G->I";
+  const [inputVal, setInputVal] = useState(defaultRaw);
   
   const handleSubmit = () => {
     try {
-      const parsed = JSON.parse(inputVal);
+      let parsed = {};
+      if (inputVal.trim().startsWith('{')) {
+        parsed = JSON.parse(inputVal);
+      } else {
+        // Extract plain elements split by commas or newlines, remove quotes/whitespace
+        const rawArray = inputVal
+          .split(/[\n,]+/)
+          .map(s => s.trim().replace(/^["']|["']$/g, ''))
+          .filter(s => s.length > 0);
+        parsed = { data: rawArray };
+      }
       onProcess(parsed);
     } catch (e) {
-      alert("Invalid JSON format");
+      alert("Invalid input format");
     }
   };
 
