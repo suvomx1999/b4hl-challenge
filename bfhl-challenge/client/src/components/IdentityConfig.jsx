@@ -28,7 +28,7 @@ function IdentityConfig({ config, setConfig }) {
             className="config-input"
             value={config.email_id}
             onChange={handleChange}
-            placeholder="shubashis.mete@srm.edu.in"
+            placeholder="sm6826@srmist.edu.in"
           />
         </div>
         <div className="input-col">
