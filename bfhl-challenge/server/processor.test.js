@@ -114,6 +114,32 @@ function testPdfExample() {
   console.log('testPdfExample passed');
 }
 
+function testRandomMaliciousInputs() {
+  const data = [
+    null, undefined, 1234, false, { "trick": "object" }, ["nested", "array"], 
+    "H->J", 
+    "A->B->C", "---", "$->%", 
+    "K->L", "K->L ", " K->L",
+    "G->G", ""
+  ];
+  
+  const { valid_edges, invalid_entries, duplicate_edges } = parseEntries(data);
+  const { hierarchies, summary } = buildHierarchies(valid_edges);
+
+  // We should successfully ignore 11 complete "gibberish" entities.
+  assert.strictEqual(invalid_entries.length, 11);
+  
+  // Handled whitespace correctly to create identical edges (which become duplicate, stored once)
+  assert.deepStrictEqual(duplicate_edges, ["K->L"]);
+  
+  // Valid edges remaining stringently processed
+  assert.strictEqual(summary.total_trees, 2);
+  assert.strictEqual(hierarchies.find(h => h.root === 'H').depth, 2);
+  assert.strictEqual(hierarchies.find(h => h.root === 'K').depth, 2);
+  
+  console.log('testRandomMaliciousInputs passed');
+}
+
 try {
   testBasicTree();
   testPureCycle();
@@ -122,6 +148,7 @@ try {
   testDiamond();
   testTiebreak();
   testPdfExample();
+  testRandomMaliciousInputs();
   console.log('All tests passed!');
 } catch (error) {
   console.error('Test failed:', error);
