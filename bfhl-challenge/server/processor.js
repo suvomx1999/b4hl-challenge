@@ -119,7 +119,7 @@ function buildHierarchies(valid_edges) {
       
       const hierarchy = {
         root: root,
-        tree: result.tree,
+        tree: result.hasCycle ? {} : result.tree,
       };
       
       if (result.hasCycle) {
@@ -152,7 +152,7 @@ function buildHierarchies(valid_edges) {
       
       hierarchies.push({
         root: node,
-        tree: result.tree,
+        tree: {},
         has_cycle: true
       });
       total_cycles++;
