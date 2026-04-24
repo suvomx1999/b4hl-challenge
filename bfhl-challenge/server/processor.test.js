@@ -72,6 +72,48 @@ function testTiebreak() {
   console.log('testTiebreak passed');
 }
 
+function testPdfExample() {
+  const data = [
+    "A->B", "A->C", "B->D", "C->E", "E->F",
+    "X->Y", "Y->Z", "Z->X",
+    "P->Q", "Q->R",
+    "G->H", "G->H", "G->I",
+    "hello", "1->2", "A->"
+  ];
+  
+  const { valid_edges, duplicate_edges, invalid_entries } = parseEntries(data);
+  const { hierarchies, summary } = buildHierarchies(valid_edges);
+  
+  // Verify counts
+  assert.strictEqual(summary.total_trees, 3);
+  assert.strictEqual(summary.total_cycles, 1);
+  assert.strictEqual(summary.largest_tree_root, 'A');
+  
+  // Verify invalid & duplicates
+  assert.deepStrictEqual(invalid_entries, ["hello", "1->2", "A->"]);
+  assert.deepStrictEqual(duplicate_edges, ["G->H"]);
+  
+  // Verify hierarchy structures
+  // 1: A tree
+  const rootA = hierarchies.find(h => h.root === 'A');
+  assert.strictEqual(rootA.depth, 4);
+  
+  // 2: X cycle
+  const rootX = hierarchies.find(h => h.root === 'X');
+  assert.strictEqual(rootX.has_cycle, true);
+  assert.deepStrictEqual(rootX.tree, {}); // Empty tree per new rule
+  
+  // 3: P tree
+  const rootP = hierarchies.find(h => h.root === 'P');
+  assert.strictEqual(rootP.depth, 3);
+  
+  // 4: G tree
+  const rootG = hierarchies.find(h => h.root === 'G');
+  assert.strictEqual(rootG.depth, 2);
+  
+  console.log('testPdfExample passed');
+}
+
 try {
   testBasicTree();
   testPureCycle();
@@ -79,6 +121,7 @@ try {
   testInvalidBatch();
   testDiamond();
   testTiebreak();
+  testPdfExample();
   console.log('All tests passed!');
 } catch (error) {
   console.error('Test failed:', error);
