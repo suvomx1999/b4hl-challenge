@@ -1,0 +1,14 @@
+{
+  "name": "bfhl-api",
+  "version": "1.0.0",
+  "description": "Express API for BFHL challenge",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node processor.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
