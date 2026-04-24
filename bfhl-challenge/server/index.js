@@ -11,12 +11,12 @@ app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
 const USER_ID = process.env.USER_ID || "shubashismete_14082003";
-const EMAIL_ID = process.env.EMAIL_ID || "<your_srm_email>";
+const EMAIL_ID = process.env.EMAIL_ID || "<your_srmist_email>";
 const ROLL_NUMBER = process.env.ROLL_NUMBER || "<your_roll_number>";
 
 app.post('/bfhl', (req, res) => {
   const { data } = req.body;
-  
+
   if (!Array.isArray(data)) {
     return res.status(400).json({ is_success: false, message: "Invalid input: 'data' must be an array." });
   }
@@ -32,7 +32,6 @@ app.post('/bfhl', (req, res) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      // Decode with shared secret. Make sure it doesn't crash on fail.
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'bfhl-secret-key');
       if (decoded.user_id) currentUserId = decoded.user_id;
       if (decoded.email_id) currentEmailId = decoded.email_id;
